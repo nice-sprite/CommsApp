@@ -10,6 +10,8 @@ function GetCommissionFileEntity()
     let commissionFile = commissionsFolder.getFile('commissions.json');
     return commissionFile;
 }
+
+
 async function LoadCommissionsFromFile()
 {
     let commissionFile = GetCommissionFileEntity();
@@ -19,17 +21,12 @@ async function LoadCommissionsFromFile()
     try
     {
         commissionPlain = JSON.parse(commissionPlain);
-        // console.log("COMMISSIONPLAIN", typeof commissionPlain)
-
-
-        commsArray = [];
+        
         Object.keys(commissionPlain).forEach(key =>
         {
-            let { title, description, cost, for_who, finished, date_added } = commissionPlain[key];
-            commsArray.push(new CommissionClass(title, description, cost, for_who, finished, date_added));
+            let { title, description, cost, for_who, finished, date_added, commission_id } = commissionPlain[key];
+            commsArray.push(new CommissionClass(title, description, cost, for_who, finished, date_added, commission_id));
         });
-        // console.log("COMMS ARRAY", commsArray);
-
 
     } catch (e)
     {
@@ -52,8 +49,33 @@ async function AppendCommissionToFile(commission)
     return file.writeText(JSON.stringify(currentContents));
 }
 
+// function DeleteCommissionInFile(commission_uuid)
+// {
+
+// }
+
+async function ResetCommissionFile()
+{
+    return GetCommissionFileEntity().writeText('[]');
+}
+
+async function WriteTestData()
+{
+    let testData = [];
+    let randStr = () => Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    for (let i = 0; i < 20; i++)
+    {
+        testData.push(new CommissionClass(randStr(), randStr(), Math.random()*50, randStr(), Math.random() > .5, new Date, randStr()))    
+    }
+
+    let file = GetCommissionFileEntity();
+    return file.writeText(JSON.stringify(testData));
+}
+
 
 module.exports = {
     LoadCommissionsFromFile,
-    AppendCommissionToFile
+    AppendCommissionToFile,
+    ResetCommissionFile,
+    WriteTestData,
 }

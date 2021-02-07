@@ -25,23 +25,9 @@
             <StackLayout orientation="horizontal" width="100%">
                 <Label
                     class="money-display"
-                    :text="
-                        
-                        totalPotential.toFixed(2)
-                    "
+                    :text="totalPotential.toFixed(2)"
                 ></Label>
-                <Label
-                    class="money-display"
-                    :text="
-                        
-                        commissions
-                            .filter(item => item.finished)
-                            .map((item) => item.cost)
-                            .reduce((accum, current) => accum + current, 0)
-                            .toFixed(2)
-                    "
-                    :key="totalPotential"
-                ></Label>
+                <Label class="money-display" :text="totalEarned.toFixed(2)"></Label>
             </StackLayout>
             <Button
                 id="shitButton"
@@ -55,9 +41,14 @@
 <script>
 import CommissionItem from "./CommissionItem.vue";
 import AddCommissionModal from "./AddCommissionModal";
-import { LoadCommissionsFromFile, AppendCommissionToFile } from './FileHelper'
-let {CommissionClass} = require( './CommissionClass.js');
-console.log("COMMISSION", CommissionClass)
+import {
+    LoadCommissionsFromFile,
+    AppendCommissionToFile,
+    ResetCommissionFile,
+    WriteTestData,
+} from "../custom/FileHelper";
+let { CommissionClass } = require("../custom/CommissionClass");
+
 export default {
     components: {
         CommissionItem: CommissionItem,
@@ -65,24 +56,33 @@ export default {
     data() {
         return {
             count: 0,
-            commissions: [
-                {
-                    title: "My Title",
-                    description: "I want marge simpson commission uwu",
-                    cost: Number(1000),
-                    for_who: "Mystic#9217",
-                    finished: false,
-                    date_added: new Date(),
-                },
-            ],
+            commissions: [],
             totalPotential: 0,
             totalEarned: 0,
         };
     },
 
-    async created() {
-        await AppendCommissionToFile(new CommissionClass("My Title", "", 100, "asdasd", false, new Date))
-        return console.log(await LoadCommissionsFromFile());
+    async mounted() {
+        // await AppendCommissionToFile(new CommissionClass("My Title", "", 100, "asdasd", false, new Date(), undefined))
+        // await WriteTestData();
+        // this.commissions.concat(await LoadCommissionsFromFile())
+        WriteTestData().then(() => {
+            LoadCommissionsFromFile().then((comms) => {
+
+                this.commissions = [].concat(comms);
+                Object.keys(comms).forEach((key) => {
+                    console.log(comms[key].cost);
+                    this.totalPotential += comms[key].cost;
+                    if(comms[key].finished)
+                    {
+                        this.totalEarned += comms[key].cost;
+                    }
+                });
+                
+            });
+        });
+
+        // await ResetCommissionFile();
     },
 
     methods: {
@@ -124,9 +124,8 @@ export default {
     background: black;
 }
 
-
 .money-display {
-    color: aqua; 
+    color: aqua;
     text-align: center;
     width: 50%;
 }
