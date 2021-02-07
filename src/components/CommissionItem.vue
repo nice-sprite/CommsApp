@@ -138,7 +138,7 @@ export default {
 .finished-item {
     text-decoration: line-through;
     text-transform: lowercase;
-    background-color: black;
+    // background-color: black;
     opacity: 0.45;
 }
 

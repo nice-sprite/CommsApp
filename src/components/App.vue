@@ -1,6 +1,6 @@
 <template>
     <Page class="page-dark">
-        <ActionBar title="Commission Tracker" class="action-bar-dark" />
+        <ActionBar title="Commission Tracker" class="action-bar-dark" style="background: black;" />
         <StackLayout class="ma-0 pa-0">
             <ScrollView
                 height="90%"
@@ -78,16 +78,12 @@ export default {
     },
 
     async mounted() {
-        // await AppendCommissionToFile(new CommissionClass("My Title", "", 100, "asdasd", false, new Date(), undefined))
-        // await WriteTestData();
-        // this.commissions.concat(await LoadCommissionsFromFile())
+        
         WriteTestData().then(() => {
             LoadCommissionsFromFile().then((comms) => {
                 this.commissions = [].concat(comms);
             });
         });
-
-        // await ResetCommissionFile();
     },
 
     methods: {
