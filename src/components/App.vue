@@ -15,7 +15,7 @@
                             :title="comm.title"
                             :description="comm.description"
                             :cost="comm.cost"
-                            :finished="comm.finished"
+                            :finished.sync="comm.finished"
                             :for_who="comm.for_who"
                             :date_added="comm.date_added"
                         ></CommissionItem>
@@ -25,9 +25,12 @@
             <StackLayout orientation="horizontal" width="100%">
                 <Label
                     class="money-display"
-                    :text="totalPotential.toFixed(2)"
+                    :text="'$' +totalPotential.toFixed(2)"
                 ></Label>
-                <Label class="money-display" :text="totalEarned.toFixed(2)"></Label>
+                <Label
+                    class="money-display"
+                    :text="'$' + totalEarned.toFixed(2)"
+                ></Label>
             </StackLayout>
             <Button
                 id="shitButton"
@@ -57,9 +60,21 @@ export default {
         return {
             count: 0,
             commissions: [],
-            totalPotential: 0,
-            totalEarned: 0,
         };
+    },
+
+    computed: {
+        totalPotential: function () {
+            return this.commissions
+                .map((e) => e.cost)
+                .reduce((acc, curr) => acc + curr, 0);
+        },
+        totalEarned: function() {
+            return this.commissions
+                .filter(e => e.finished)
+                .map((e) => e.cost)
+                .reduce((acc, curr) => acc + curr, 0);
+        }
     },
 
     async mounted() {
@@ -68,17 +83,7 @@ export default {
         // this.commissions.concat(await LoadCommissionsFromFile())
         WriteTestData().then(() => {
             LoadCommissionsFromFile().then((comms) => {
-
                 this.commissions = [].concat(comms);
-                Object.keys(comms).forEach((key) => {
-                    console.log(comms[key].cost);
-                    this.totalPotential += comms[key].cost;
-                    if(comms[key].finished)
-                    {
-                        this.totalEarned += comms[key].cost;
-                    }
-                });
-                
             });
         });
 
@@ -101,14 +106,14 @@ export default {
         addCommission(title, description, cost, for_who, finished) {
             console.log(title, description, cost, for_who, finished);
             this.totalPotential += Number(cost);
-            this.commissions[this.commissions.length] = {
+            this.commissions.push({
                 title: title,
                 description: description,
                 cost: Number(cost),
                 for_who: for_who,
                 finished: finished,
                 date_added: new Date(),
-            };
+            });
         },
     },
 };

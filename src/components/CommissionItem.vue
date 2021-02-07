@@ -1,7 +1,7 @@
 <template>
     <GridLayout
         class="list-item-container"
-        :class="{'finished-item': finished}"
+        :class="{ 'finished-item': finished }"
         columns="5*,2*, 1*"
         rows="*"
         @longPress="showMenu"
@@ -10,13 +10,13 @@
             <Label
                 :textWrap="true"
                 class="list-item-title vcenter-text"
-                :class="{'finished-item': finished}"
+                :class="{ 'finished-item': finished }"
                 :text="title"
             ></Label>
             <Label
                 :textWrap="true"
                 class="list-item-description vcenter-text"
-                :class="{'finished-item': finished}"
+                :class="{ 'finished-item': finished }"
                 :text="description"
             ></Label>
         </StackLayout>
@@ -25,19 +25,18 @@
             <Label
                 class="list-item-cost"
                 :text="`$${cost.toFixed(2)}`"
-                :class="{'finished-item': finished}"
+                :class="{ 'finished-item': finished }"
             ></Label>
             <Label
                 class="list-item-person"
-                :class="{'finished-item': finished}"
+                :class="{ 'finished-item': finished }"
                 :text="for_who"
             ></Label>
             <Label
                 class="list-item-person"
-                :class="{'finished-item': finished}"
+                :class="{ 'finished-item': finished }"
                 :text="`${date_added.toISOString()}`"
             ></Label>
-
         </StackLayout>
     </GridLayout>
 </template>
@@ -48,30 +47,47 @@ export default {
 
     data() {},
 
-    props: ["title", "description", "cost", "finished", "for_who", "date_added"],
+    props: [
+        "title",
+        "description",
+        "cost",
+        "finished",
+        "for_who",
+        "date_added",
+    ],
 
     methods: {
         onFinishedCommission() {
             this.finished = true;
         },
 
-        showMenu() {
-            console.log("showMenu called")
+        showMenu(args) {
+            // args.object, args.view, args.eventName
+            console.log("showMenu called");
+
             const Detail = {
                 template: `
-    <Frame>
-      <Page height="50%">
-        <ActionBar title="Mark as Finished?"/>
-        <GridLayout rows="auto, auto", columns="1*, 1*">
-            <Label  row="0" col="0" colSpan="3"text="comm will be marked as finished" style="text-align: center; font-size: 12pt; padding: 3em;  margin-top: 5em;"></Label>
-            <Button row="1" col="0"  @tap="$modal.close" text="Okay" />
-            <Button row="1" col="1"  @tap="$modal.close" text="Cancel" />
-        </GridLayout>
-      </Page>
-    </Frame>
-  `,
+                    <Frame>
+                      <Page height="50%">
+                        <ActionBar title="Mark as Finished?"/>
+                        <GridLayout rows="auto, auto", columns="1*, 1*">
+                            <Label  row="0" col="0" colSpan="3"text="comm will be marked as finished" style="text-align: center; font-size: 12pt; padding: 3em;  margin-top: 5em;"></Label>
+                            <Button row="1" col="0"  @tap="() => {onOk(); $modal.close()}" text="Okay" />
+                            <Button row="1" col="1"  @tap="$modal.close" text="Cancel" />
+                        </GridLayout>
+                      </Page>
+                    </Frame>
+                `,
+                methods: {
+                    onOk: () => {
+                        // console.log(arguments[0]);
+                        this.finished = true;
+                        this.$emit("update:finished", true);
+                    }
+                },
             };
             this.$showModal(Detail);
+            
         },
     },
 };
@@ -114,7 +130,7 @@ export default {
         color: rgba(127, 255, 212, 0.753);
         font-weight: 300;
         margin-top: 0;
-        
+
         padding-top: 0;
     }
 }
@@ -123,7 +139,7 @@ export default {
     text-decoration: line-through;
     text-transform: lowercase;
     background-color: black;
-    opacity: .45;
+    opacity: 0.45;
 }
 
 .vcenter-text {
