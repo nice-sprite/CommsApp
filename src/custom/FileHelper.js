@@ -49,10 +49,16 @@ async function AppendCommissionToFile(commission)
     return file.writeText(JSON.stringify(currentContents));
 }
 
-// function DeleteCommissionInFile(commission_uuid)
-// {
+async function DeleteCommissionInFile(commission_uuid)
+{
+    let file = GetCommissionFileEntity();
+    let data = await file.readText();
+    let commissions = JSON.parse(data);
+    const index = commissions.findIndex(comm => comm.commission_id == commission_uuid);
+    commissions.splice(index, 1);
+    return file.writeText(JSON.stringify(commissions));
 
-// }
+}
 
 async function ResetCommissionFile()
 {
@@ -78,4 +84,5 @@ module.exports = {
     AppendCommissionToFile,
     ResetCommissionFile,
     WriteTestData,
+    DeleteCommissionInFile
 }

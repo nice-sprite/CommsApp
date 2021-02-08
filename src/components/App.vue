@@ -1,6 +1,10 @@
 <template>
     <Page class="page-dark">
-        <ActionBar title="Commission Tracker" class="action-bar-dark" style="background: black;" />
+        <ActionBar
+            title="Commission Tracker"
+            class="action-bar-dark"
+            style="background: black"
+        />
         <StackLayout class="ma-0 pa-0">
             <ScrollView
                 height="90%"
@@ -25,7 +29,7 @@
             <StackLayout orientation="horizontal" width="100%">
                 <Label
                     class="money-display"
-                    :text="'$' +totalPotential.toFixed(2)"
+                    :text="'$' + totalPotential.toFixed(2)"
                 ></Label>
                 <Label
                     class="money-display"
@@ -69,20 +73,24 @@ export default {
                 .map((e) => e.cost)
                 .reduce((acc, curr) => acc + curr, 0);
         },
-        totalEarned: function() {
+        totalEarned: function () {
             return this.commissions
-                .filter(e => e.finished)
+                .filter((e) => e.finished)
                 .map((e) => e.cost)
                 .reduce((acc, curr) => acc + curr, 0);
-        }
+        },
     },
 
     async mounted() {
-        
-        WriteTestData().then(() => {
-            LoadCommissionsFromFile().then((comms) => {
-                this.commissions = [].concat(comms);
-            });
+        // for testing
+        // WriteTestData().then(() => {
+        //     LoadCommissionsFromFile().then((comms) => {
+        //         this.commissions = [].concat(comms);
+        //     });
+        // });
+        // await ResetCommissionFile();
+        LoadCommissionsFromFile().then((comms) => {
+            this.commissions = [].concat(comms);
         });
     },
 
@@ -99,17 +107,18 @@ export default {
             });
         },
 
-        addCommission(title, description, cost, for_who, finished) {
-            console.log(title, description, cost, for_who, finished);
-            this.totalPotential += Number(cost);
-            this.commissions.push({
-                title: title,
-                description: description,
-                cost: Number(cost),
-                for_who: for_who,
-                finished: finished,
-                date_added: new Date(),
-            });
+        async addCommission(title, description, cost, for_who, finished) {
+            // console.log(title, description, cost, for_who, finished);
+            let comm = new CommissionClass(
+                title,
+                description,
+                Number(cost),
+                for_who,
+                finished,
+                new Date()
+            );
+            this.commissions.push(comm);
+            await AppendCommissionToFile(comm);
         },
     },
 };

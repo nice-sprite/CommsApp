@@ -6,6 +6,15 @@ class CommissionClass
     {
         this.title = title;
         this.description = description;
+
+        try
+        {
+            this.cost = Number(cost)
+            this.cost.toFixed(2);
+        } catch (e)
+        {
+            console.log(e, "CommissionClass: cost is not convertable to number");
+        }
         this.cost = cost;
         this.for_who = for_who;
         this.finished = finished;
