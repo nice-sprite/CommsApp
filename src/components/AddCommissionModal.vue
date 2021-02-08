@@ -22,7 +22,7 @@
                             v-model="for_who"
                             hint="Commissioner Contact Info/Notes"
                         ></TextField>
-                        <TextField v-model="cost" hint="Payment due"></TextField>
+                        <TextField v-model="cost" keyboardType="number" hint="Payment due"></TextField>
                         <TextView
                             v-model="description"
                             hint="Description"
