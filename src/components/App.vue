@@ -88,7 +88,7 @@ export default {
         //         this.commissions = [].concat(comms);
         //     });
         // });
-        // await ResetCommissionFile();
+        await ResetCommissionFile();
         LoadCommissionsFromFile().then((comms) => {
             this.commissions = [].concat(comms);
         });
@@ -108,7 +108,7 @@ export default {
         },
 
         async addCommission(title, description, cost, for_who, finished) {
-            // console.log(title, description, cost, for_who, finished);
+            console.log(title, description, cost, for_who, finished);
             let comm = new CommissionClass(
                 title,
                 description,

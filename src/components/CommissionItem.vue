@@ -37,6 +37,11 @@
                 :class="{ 'finished-item': finished }"
                 :text="`${date_added.toISOString()}`"
             ></Label>
+            <Label
+                class="list-item-person"
+                :class="{ 'finished-item': finished }"
+                :text="finished"
+            ></Label>
         </StackLayout>
     </GridLayout>
 </template>
@@ -58,7 +63,8 @@ export default {
 
     methods: {
         onFinishedCommission() {
-            this.finished = true;
+            this.finished = !this.finished;
+            console.log('comm is now ', this.finished)
         },
 
         showMenu(args) {
@@ -81,8 +87,8 @@ export default {
                 methods: {
                     onOk: () => {
                         // console.log(arguments[0]);
-                        this.finished = true;
-                        this.$emit("update:finished", true);
+                        this.finished = !this.finished;
+                        this.$emit("update:finished", this.finished);
                     }
                 },
             };

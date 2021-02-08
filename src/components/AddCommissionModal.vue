@@ -2,42 +2,17 @@
     <Frame>
         <Page height="70%">
             <ActionBar title="Add Commission" />
-            <GridLayout rows="auto, auto, auto" , columns="1*, 1*">
-                <Label
-                    row="0"
-                    col="0"
-                    colSpan="3"
-                    text="Enter Commission Details"
-                    style="
-                        text-align: center;
-                        font-size: 12pt;
-                        padding: 3em;
-                        margin-top: 5em;
-                    "
-                ></Label>
-                <ScrollView height="60%" row="1" col="0" colSpan="3" width="100%">
-                    <StackLayout >
-                        <TextField v-model="title" hint="Title"></TextField>
-                        <TextField
-                            v-model="for_who"
-                            hint="Commissioner Contact Info/Notes"
-                        ></TextField>
-                        <TextField v-model="cost" keyboardType="number" hint="Payment due"></TextField>
-                        <TextView
-                            v-model="description"
-                            hint="Description"
-                            style="border: 1px solid #00beff"
-                        ></TextView>
-                    </StackLayout>
+            <StackLayout height="100%">
+                <ScrollView height="80%">
+                    <RadDataForm
+                        ref="form"
+                        :source="commissionData"
+                        :metadata="commissionDataMetadata"
+                    ></RadDataForm>
                 </ScrollView>
-                <Button
-                    row="2"
-                    col="0"
-                    @tap="() => addCommission($modal)"
-                    text="Okay"
-                />
-                <Button row="2" col="1" @tap="$modal.close" text="Cancel" />
-            </GridLayout>
+
+                <Button text="Add" @tap="() => addCommission($modal)"></Button>
+            </StackLayout>
         </Page>
     </Frame>
 </template>
@@ -56,21 +31,140 @@ export default {
 
     data() {
         return {
-            title: '',
-            description: '',
-            cost: 0,
-            finished: false,
-            for_who: '',
-        }
+            commissionData: {
+                title: "",
+                description: "",
+                cost: 0,
+                finished: false,
+                for_who: "",
+            },
+            commissionDataMetadata: {
+                propertyAnnotations: [
+                    {
+                        name: "title",
+                        index: 0,
+                        validators: [
+                            {
+                                name: "NonEmpty",
+                                params: { errorMessage: "Required" },
+                            },
+                            {
+                                name: "MaximumLength",
+                                params: {
+                                    length: 32,
+                                    errorMessage:
+                                        "must be less than 32 characters",
+                                },
+                            },
+                        ],
+                    },
+                    {
+                        name: "cost",
+                        displayName: "Expected Payment",
+                        index: 1,
+                        validators: [
+                            {
+                                name: "NonEmpty",
+                                params: { errorMessage: "required" },
+                            },
+                            {
+                                name: "RangeValidator",
+                                params: {
+                                    minimum: 1,
+                                    errorMessage:
+                                        "Don't work for free!(enter number > 1)",
+                                },
+                            },
+                        ],
+                    },
+                    {
+                        name: "for_who",
+                        displayName: "Contact Info",
+                        index: 2,
+                        validators: [{ name: "NonEmpty" }],
+                    },
+                    {
+                        name: "description",
+                        displayName: "Description",
+                        index: 3,
+                        validators: [],
+                    },
+                    {
+                        name: "finished",
+                        displayName: "Finished",
+                        index: 4,
+                        validators: [{ name: "NonEmpty" }],
+                    },
+                ],
+            },
+        };
     },
 
     methods: {
         addCommission($modal) {
-            if (this.onAddPressed) {
-                
-                this.onAddPressed(this.title, this.description, this.cost, this.for_who, this.finished);
-            }
-            $modal.close();
+            //  validate form data
+            const form = this.$refs.form;
+            form.commitAll();
+            form.validateAll().then((validatedSuccessfully) => {
+                if (validatedSuccessfully) {
+                    // everything validated successfully so, we can make the new commission
+                    let commission = {};
+                    [
+                        "title",
+                        "description",
+                        "cost",
+                        "finished",
+                        "for_who",
+                    ].forEach((propName) => {
+                        console.log(
+                            propName,
+                            typeof form.getPropertyByName(propName)
+                                .valueCandidate
+                        );
+                        // console.log(typeof false)
+                        if (propName == "finished") {
+                            let test =
+                                "" +
+                                form.getPropertyByName(propName).valueCandidate;
+                            if (test == "true") test = true;
+                            else test = false;
+                            console.log(
+                                "FINISHED",
+                                test,
+                                typeof Boolean(test).valueOf(),
+                                Boolean(test).valueOf()
+                            );
+                        }
+
+                        commission[propName] = form.getPropertyByName(
+                            propName
+                        ).valueCandidate;
+                    });
+
+                    if (this.onAddPressed) {
+                        let test =
+                            "" +
+                            form.getPropertyByName('finished').valueCandidate;
+                        if (test == "true") test = true;
+                        else test = false;
+                        commission.finished = test;
+                        this.onAddPressed(
+                            commission.title,
+                            commission.description,
+                            commission.cost,
+                            commission.for_who,
+                            commission.finished
+                        );
+                    }
+                    $modal.close();
+                } else {
+                    alert({
+                        title: "Invalid Inputs",
+                        message: "Make sure you filled out all required fields",
+                        okButtonText: "Ok",
+                    });
+                }
+            });
         },
     },
 };
