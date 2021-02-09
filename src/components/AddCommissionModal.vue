@@ -1,7 +1,7 @@
 <template>
     <Frame>
         <Page height="70%">
-            <ActionBar title="Add Commission" />
+            <ActionBar title="Add Commission"/>
             <StackLayout height="100%">
                 <ScrollView height="80%">
                     <RadDataForm
@@ -10,8 +10,13 @@
                         :metadata="commissionDataMetadata"
                     ></RadDataForm>
                 </ScrollView>
-
-                <Button text="Add" @tap="() => addCommission($modal)"></Button>
+                <StackLayout orientation="horizontal" width="100%">
+                    <Button
+                        text="Add"
+                        @tap="() => addCommission($modal)"
+                    ></Button>
+                    <Button text="Cancel" @tap="$modal.close"></Button>
+                </StackLayout>
             </StackLayout>
         </Page>
     </Frame>
@@ -20,14 +25,7 @@
 <script>
 export default {
     name: "AddCommissionModal",
-    props: [
-        // "title",
-        // "description",
-        // "cost",
-        // "finished",
-        // "for_who",
-        "onAddPressed",
-    ],
+    props: ["onAddPressed"],
 
     data() {
         return {
@@ -64,13 +62,10 @@ export default {
                         index: 1,
                         validators: [
                             {
-                                name: "NonEmpty",
-                                params: { errorMessage: "required" },
-                            },
-                            {
                                 name: "RangeValidator",
                                 params: {
-                                    minimum: 1,
+                                    minimum: 1.0,
+                                    maximum: Number.MAX_VALUE,
                                     errorMessage:
                                         "Don't work for free!(enter number > 1)",
                                 },
@@ -116,26 +111,6 @@ export default {
                         "finished",
                         "for_who",
                     ].forEach((propName) => {
-                        console.log(
-                            propName,
-                            typeof form.getPropertyByName(propName)
-                                .valueCandidate
-                        );
-                        // console.log(typeof false)
-                        if (propName == "finished") {
-                            let test =
-                                "" +
-                                form.getPropertyByName(propName).valueCandidate;
-                            if (test == "true") test = true;
-                            else test = false;
-                            console.log(
-                                "FINISHED",
-                                test,
-                                typeof Boolean(test).valueOf(),
-                                Boolean(test).valueOf()
-                            );
-                        }
-
                         commission[propName] = form.getPropertyByName(
                             propName
                         ).valueCandidate;
@@ -144,7 +119,7 @@ export default {
                     if (this.onAddPressed) {
                         let test =
                             "" +
-                            form.getPropertyByName('finished').valueCandidate;
+                            form.getPropertyByName("finished").valueCandidate;
                         if (test == "true") test = true;
                         else test = false;
                         commission.finished = test;

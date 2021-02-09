@@ -65,11 +65,12 @@ async function ResetCommissionFile()
     return GetCommissionFileEntity().writeText('[]');
 }
 
+//helper for testing only
 async function WriteTestData()
 {
     let testData = [];
     let randStr = () => Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    for (let i = 0; i < 20; i++)
+    for (let i = 0; i < 3; i++)
     {
         testData.push(new CommissionClass(randStr(), randStr(), Math.random()*50, randStr(), Math.random() > .5, new Date, randStr()))    
     }
@@ -78,11 +79,26 @@ async function WriteTestData()
     return file.writeText(JSON.stringify(testData));
 }
 
+// valid updateOptions fields are:
+//      title, description, cost, for_who, finished, date_added, commission_id
+async function UpdateCommissionInFile(commission_uuid, updateOptions) {
+    let file = GetCommissionFileEntity();
+    let fileData = await file.readText();
+    let commissions = JSON.parse(fileData);
+    let index = commissions.findIndex(comm => comm.commission_id == commission_uuid);
+    Object.keys(updateOptions).forEach(propKey =>
+    {
+        commissions[index][propKey] = updateOptions[propKey];
+    });
+
+    return file.writeText(JSON.stringify(commissions))
+}
 
 module.exports = {
     LoadCommissionsFromFile,
     AppendCommissionToFile,
     ResetCommissionFile,
     WriteTestData,
-    DeleteCommissionInFile
+    DeleteCommissionInFile,
+    UpdateCommissionInFile,
 }

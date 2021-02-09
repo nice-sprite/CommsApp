@@ -1,10 +1,6 @@
 <template>
     <Page class="page-dark">
-        <ActionBar
-            title="Commission Tracker"
-            class="action-bar-dark"
-            style="background: black"
-        />
+        <ActionBar title="Commission Tracker" class="action-bar-dark" />
         <StackLayout class="ma-0 pa-0">
             <ScrollView
                 height="90%"
@@ -12,7 +8,7 @@
                 width="100%"
                 class="ma-0 pa-0"
             >
-                <ListView for="comm in commissions" class="ma-0 pa-0">
+                <ListView for="(comm, index) in commissions" class="ma-0 pa-0">
                     <v-template>
                         <CommissionItem
                             class=""
@@ -22,6 +18,9 @@
                             :finished.sync="comm.finished"
                             :for_who="comm.for_who"
                             :date_added="comm.date_added"
+                            :index="index"
+                            @itemDeleted="deleteCommissionItem"
+                            @update:finished="updateFinished(index, ...arguments)"
                         ></CommissionItem>
                     </v-template>
                 </ListView>
@@ -29,17 +28,21 @@
             <StackLayout orientation="horizontal" width="100%">
                 <Label
                     class="money-display"
-                    :text="'$' + totalPotential.toFixed(2)"
+                    :text="'potential earnings: $' + totalPotential.toFixed(2)"
+                    color="lightgreen"
+                    style="border-width: 1px; border-color: lightgreen"
                 ></Label>
                 <Label
                     class="money-display"
-                    :text="'$' + totalEarned.toFixed(2)"
+                    :text="'current earnings: $' + totalEarned.toFixed(2)"
+                    color="skyblue"
+                    style="border-width: 1px; border-color: skyblue"
                 ></Label>
             </StackLayout>
             <Button
-                id="shitButton"
                 text="Add Commission"
                 @tap="addCommissionDialog"
+                style="margin-left: 25%; margin-right: 25%"
             ></Button>
         </StackLayout>
     </Page>
@@ -53,6 +56,8 @@ import {
     AppendCommissionToFile,
     ResetCommissionFile,
     WriteTestData,
+    DeleteCommissionInFile,
+    UpdateCommissionInFile
 } from "../custom/FileHelper";
 let { CommissionClass } = require("../custom/CommissionClass");
 
@@ -88,7 +93,7 @@ export default {
         //         this.commissions = [].concat(comms);
         //     });
         // });
-        await ResetCommissionFile();
+        // await ResetCommissionFile();
         LoadCommissionsFromFile().then((comms) => {
             this.commissions = [].concat(comms);
         });
@@ -120,18 +125,31 @@ export default {
             this.commissions.push(comm);
             await AppendCommissionToFile(comm);
         },
+
+        // takes the index of the commission item to remove
+        async deleteCommissionItem(index) {
+            DeleteCommissionInFile(this.commissions[index].commission_id);
+            this.commissions.splice(index, 1);
+        },
+
+        async updateFinished(index, event) {
+            // console.log("updating comm index ", index, typeof index, `event ${event}`)
+            await UpdateCommissionInFile(this.commissions[index].commission_id, {
+                finished: event,
+            });
+        },
     },
 };
 </script>
 
 <style scoped lang="scss">
 .action-bar-dark {
-    background: #1f1f1f;
-    color: aqua;
+    background: rgb(29, 29, 29);
+    color: lightblue;
 }
 
 .page-dark {
-    background: black;
+    background: rgb(29, 29, 29);
 }
 
 .money-display {
@@ -141,7 +159,7 @@ export default {
 }
 Button {
     background-color: #313131;
-    color: aqua;
+    color: lightblue;
 }
 
 .ma-0 {
