@@ -1,6 +1,6 @@
 # CommissionApp
 
-> native app for helping freelance artists keep track of commissions
+> android app for helping freelance artists keep track of commissions
 
 ## Usage
 
