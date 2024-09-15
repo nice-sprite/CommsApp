@@ -1,7 +1,7 @@
 # CommissionApp
 
 > android app for helping freelance artists keep track of commissions
-
+![](comm_app1.jpg)
 ## Usage
 
 ``` bash
